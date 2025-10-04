@@ -7,7 +7,7 @@ router = APIRouter()
 # 🧭 View all words
 @router.get("/admin", response_class=HTMLResponse)
 def admin_dashboard():
-    conn = sqlite3.connect("words.db")
+    conn = sqlite3.connect("static/words.db")
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM words")
     rows = cursor.fetchall()
@@ -29,6 +29,7 @@ def admin_dashboard():
         </tr>
         """
     html += "</table><br><a href='/admin/add-form'>Add New Word</a>"
+    html += "<br><br><a href='/static/words.db' download>📥 Download words.db</a>"
     return html
 
 # ➕ Add form
@@ -57,7 +58,7 @@ def add_word(
     suffixes: str = Form(""),
     duolingo_unit: str = Form("")
 ):
-    conn = sqlite3.connect("words.db")
+    conn = sqlite3.connect("static/words.db")
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO words (
@@ -72,12 +73,12 @@ def add_word(
     ))
     conn.commit()
     conn.close()
-    return HTMLResponse("<p>Word added. <a href='/admin'>Back to admin</a></p>")
+    return HTMLResponse("<p>✅ Word added. <a href='/admin'>Back to admin</a></p>")
 
 # ✏️ Edit form
 @router.get("/admin/edit/{word_id}", response_class=HTMLResponse)
 def edit_form(word_id: int):
-    conn = sqlite3.connect("words.db")
+    conn = sqlite3.connect("static/words.db")
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM words WHERE id = ?", (word_id,))
     word = cursor.fetchone()
@@ -107,7 +108,7 @@ def update_word(
     suffixes: str = Form(""),
     duolingo_unit: str = Form("")
 ):
-    conn = sqlite3.connect("words.db")
+    conn = sqlite3.connect("static/words.db")
     cursor = conn.cursor()
     cursor.execute("""
         UPDATE words SET
@@ -122,14 +123,14 @@ def update_word(
     ))
     conn.commit()
     conn.close()
-    return HTMLResponse("<p>Word updated. <a href='/admin'>Back to admin</a></p>")
+    return HTMLResponse("<p>✅ Word updated. <a href='/admin'>Back to admin</a></p>")
 
 # ❌ Delete
 @router.get("/admin/delete/{word_id}", response_class=HTMLResponse)
 def delete_word(word_id: int):
-    conn = sqlite3.connect("words.db")
+    conn = sqlite3.connect("static/words.db")
     cursor = conn.cursor()
     cursor.execute("DELETE FROM words WHERE id = ?", (word_id,))
     conn.commit()
     conn.close()
-    return HTMLResponse("<p>Word deleted. <a href='/admin'>Back to admin</a></p>")
+    return HTMLResponse("<p>🗑️ Word deleted. <a href='/admin'>Back to admin</a></p>")
